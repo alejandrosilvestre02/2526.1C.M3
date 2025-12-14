@@ -24,8 +24,31 @@ def build_symbol_pool(rows: int, cols: int) -> List[str]:
     Sugerencia: parte de un listado básico de caracteres y duplícalo tantas
     veces como parejas necesites. Después baraja el resultado.
     """
+    casillas = rows * cols
+    if casillas % 2 != 0:
+        raise ValueError("El tablero no puede crearse")
 
-    raise NotImplementedError
+    parejas = casillas // 2
+
+    simbolos = [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
+                "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
+                "Y", "Z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",]
+
+    if parejas > len(simbolos):
+        # Repetición de la lista de simbolos
+        multiplier = (parejas + len(simbolos) - 1) // len(simbolos)
+        symbols = (simbolos * multiplier)[:parejas]
+    else:
+        symbols = simbolos[:parejas]
+
+    total_casillas = []
+    # Duplica los símbolos para tener las parejas
+    for s in symbols:
+        total_casillas.append(s)
+        total_casillas.append(s)
+
+    random.shuffle(total_casillas)
+    return total_casillas
 
 
 def create_game(rows: int, cols: int) -> GameState:

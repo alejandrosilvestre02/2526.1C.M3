@@ -63,8 +63,31 @@ def create_game(rows: int, cols: int) -> GameState:
     - ``total_pairs``: número total de parejas disponibles.
     - ``rows`` / ``cols``: dimensiones del tablero.
     """
+    if rows <= 0 or cols <= 0:
+        raise ValueError("Filas y columnas deben ser positivas")
 
-    raise NotImplementedError
+    tablero = build_symbol_pool(rows, cols)
+    board = []
+    it = iter(tablero)
+    for r in range(rows):
+        row = []
+        for c in range(cols):
+            symbol = next(it)
+            card: Card = {"symbol": symbol, "state": STATE_HIDDEN}
+            row.append(card)
+        board.append(row)
+
+    game = {
+        "board": board,
+        "pending": [],
+        "moves": 0,
+        "matches": 0,
+        "total_pairs": (rows * cols) // 2,
+        "rows": rows,
+        "cols": cols,
+    }
+    return game
+
 
 
 def reveal_card(game: GameState, row: int, col: int) -> bool:
@@ -74,8 +97,36 @@ def reveal_card(game: GameState, row: int, col: int) -> bool:
     oculta y ahora está visible) y ``False`` en cualquier otro caso. No permitas
     dar la vuelta a más de dos cartas simultáneamente.
     """
+    board = game.get("board", [])
+    rows = len(board)
+    cols = len(board[0]) if rows else 0
 
-    raise NotImplementedError
+    if not (0 <= row < rows and 0 <= col < cols):
+        return False
+
+    card = board[row][col]
+    state = card.get("state")
+
+    pending = game.get("pending", [])
+
+    # 1.Si la carta es visible o ya está encotrada, no se le da la vuelta
+    # 2.Solo se pueden ver dos cartas por turno
+    # 3.Cada posicion solo se añade una vez
+    if state == STATE_FOUND or state == STATE_VISIBLE:
+        return False
+    
+    if len(pending) >= 2:
+        return False
+
+    pos = (row, col)
+    if pos in pending:
+        return False
+
+    card["state"] = STATE_VISIBLE
+    pending.append(pos)
+    game["pending"] = pending
+    return True
+
 
 
 def resolve_pending(game: GameState) -> Tuple[bool, bool]:

@@ -109,9 +109,9 @@ def reveal_card(game: GameState, row: int, col: int) -> bool:
 
     pending = game.get("pending", [])
 
-    # 1.Si la carta es visible o ya está encotrada, no se le da la vuelta
-    # 2.Solo se pueden ver dos cartas por turno
-    # 3.Cada posicion solo se añade una vez
+    # Si la carta es visible o ya está encotrada, no se le da la vuelta
+    # Solo se pueden ver dos cartas por turno
+    # Cada posicion solo se añade una vez
     if state == STATE_FOUND or state == STATE_VISIBLE:
         return False
     
@@ -157,7 +157,7 @@ def resolve_pending(game: GameState) -> Tuple[bool, bool]:
         game["pending"] = []
         return True, True
 
-    # No coinciden: ocultar de nuevo
+    # No coinciden, se ocultan
     card1["state"] = STATE_HIDDEN
     card2["state"] = STATE_HIDDEN
     game["pending"] = []

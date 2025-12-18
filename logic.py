@@ -137,10 +137,35 @@ def resolve_pending(game: GameState) -> Tuple[bool, bool]:
     coincidan. Además, incrementa ``moves`` y ``matches`` según corresponda.
     """
 
-    raise NotImplementedError
+    pending = game.get("pending", [])
+
+    (r1, c1), (r2, c2) = pending
+    board: Board = game.get("board", [])
+    card1 = board[r1][c1]
+    card2 = board[r2][c2]
+
+    # Sacamos los símbolos de ambas cartas
+    symbol1 = card1.get("symbol")
+    symbol2 = card2.get("symbol")
+
+    game["moves"] = int(game.get("moves", 0)) + 1
+
+    if symbol1 == symbol2:
+        card1["state"] = STATE_FOUND
+        card2["state"] = STATE_FOUND
+        game["matches"] = int(game.get("matches", 0)) + 1
+        game["pending"] = []
+        return True, True
+
+    # No coinciden: ocultar de nuevo
+    card1["state"] = STATE_HIDDEN
+    card2["state"] = STATE_HIDDEN
+    game["pending"] = []
+    return True, False
 
 
 def has_won(game: GameState) -> bool:
     """Indica si se han encontrado todas las parejas."""
-
-    raise NotImplementedError
+    matches = int(game.get("matches", 0))
+    total = int(game.get("total_pairs", 0) or 0)
+    return total > 0 and matches >= total
